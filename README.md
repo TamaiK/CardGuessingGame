@@ -1,18 +1,136 @@
-## Getting Started
+## トランプ当てゲーム
+コンピューターがランダムに選んだトランプの図柄を当てるゲーム
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+図柄はハート、ダイヤ、スペード、クローバーの4種類、
+数字は2～10、A、J、Q、Kの13種類
 
-## Folder Structure
+最初に図柄を当てて、そのあとに数字を答える
 
-The workspace contains two folders by default, where:
+## 開始
+``` console
+トランプを選んだよ
+```
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+## 図柄当て
+1～4に数字を割り当て、入力は数字で行って貰う
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+``` console
+トランプの図柄を当ててね
+1:ハート
+2:ダイヤ
+3:スペード
+4:クローバー
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+どれだと思う？：
+```
 
-## Dependency Management
+## 回答チェック
+### 1～4以外の値が入力された場合
+エラーでその旨を表示し、再入力を求める
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+例：英文字
+``` console
+どれだと思う？：S
+注意：答えは1～4の数字で入れてね
+
+どれだと思う？：
+```
+
+例：1～4以外の数字を入力
+``` console
+どれだと思う？：8
+注意：答えは1～4の数字で入れてね
+
+どれだと思う？：
+```
+
+### 違う図柄
+その旨を表示し、再度回答を求める
+
+``` console
+どれだと思う？：2
+残念！ダイヤじゃないよ
+
+どれだと思う？：
+```
+
+### 正解の図柄
+その旨を表示し、次へ進む
+
+``` console
+どれだと思う？：1
+正解！図柄はハートだよ
+```
+
+## 数字当て
+図柄の正解後、今度は数字の回答を求める
+
+``` console
+次は数字を当ててね
+
+どれだと思う？：
+```
+
+## 回答チェック
+### 選択肢以外の値が入力された場合
+エラーでその旨を表示し、再入力を求める
+
+例：A、J、Q、K以外の英文字
+``` console
+どれだと思う？：S
+注意：答えは2～10、A、J、Q、Kのどれかを入れてね
+
+どれだと思う？：
+```
+
+例：2～10以外の数字を入力
+``` console
+どれだと思う？：11
+注意：答えは2～10、A、J、Q、Kのどれかを入れてね
+
+どれだと思う？：
+```
+
+### 違う数字
+その旨を表示し、再度回答を求める
+
+例：4
+``` console
+どれだと思う？：4
+残念！4じゃないよ
+
+どれだと思う？：
+```
+
+例：Q
+``` console
+どれだと思う？：Q
+残念！Qじゃないよ
+
+どれだと思う？：
+```
+
+### 正解の図柄
+その旨を表示し、図柄と合わせて正解のカードを書いて終了
+
+``` console
+どれだと思う？：J
+正解！ハートのJだよ
+```
+
+## 余談
+今回のセーフティ処理は保留
+
+理由：セーフティの起動条件を決めかねるため
+
+詳細：
+
+・回答回数に（チャレンジの項目を抜きにすると）制限がない
+
+・数当てよりも選択肢が限られている
+
+・文字も数字も読み込む処理
+
+・回答前に選択肢を表示している（図柄）
+
+・エラー時の説明で選択肢を明記している
