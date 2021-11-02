@@ -21,11 +21,11 @@ public class App {
             Name = name;
         }
 
-        public static Suit First(){
+        public static Suit first(){
             return HRART;
         }
 
-        public static Suit Last(){
+        public static Suit last(){
             return CLUB;
         }
 
@@ -68,11 +68,11 @@ public class App {
             Name = name;
         }
 
-        public static Rank First(){
+        public static Rank first(){
             return ACE;
         }
 
-        public static Rank Last(){
+        public static Rank last(){
             return KING;
         }
 
@@ -139,10 +139,10 @@ public class App {
 
     public static void main(String[] args) throws Exception {
         
-        int correctSuitNumber = createRandomNumber(Suit.First().Number, Suit.Last().Number);
+        int correctSuitNumber = createRandomNumber(Suit.first().Number, Suit.last().Number);
         Suit correctSuit = Suit.getSuitFromNumber(correctSuitNumber);
 
-        int correctRankNumber = createRandomNumber(Rank.First().Number, Rank.Last().Number);
+        int correctRankNumber = createRandomNumber(Rank.first().Number, Rank.last().Number);
         Rank correctRank = Rank.getRankFromNumber(correctRankNumber);
 
         dispPreface();
@@ -221,7 +221,7 @@ public class App {
                 
                 input = scanner.nextInt();
 
-                if(isInRange(input, Suit.First().Number, Suit.Last().Number)){               
+                if(isInRange(input, Suit.first().Number, Suit.last().Number)){               
                     
                     break;
                 }
@@ -245,7 +245,7 @@ public class App {
 
     private static void dispRequireInputInRangeNumber() {
 
-        println(MESSAGE_FORMAT_FOR_REQUIRE_INPUT_IN_RANGE_NUMBER, Suit.First().Number, Suit.Last().Number);
+        println(MESSAGE_FORMAT_FOR_REQUIRE_INPUT_IN_RANGE_NUMBER, Suit.first().Number, Suit.last().Number);
         println(MESSAGE_FOR_BLANK);
     }
 
