@@ -13,12 +13,12 @@ public class App {
         SPADE(3, "スペード"),
         CLUB(4, "クローバー");
 
-        public final int Number;
+        public final int number;
         public final String Name;
         
         private Suit(final int num, final String name){
-            Number = num;
-            Name = name;
+            this.number = num;
+            this.Name = name;
         }
 
         public static Suit first(){
@@ -33,7 +33,7 @@ public class App {
 
             for (Suit suit : Suit.values()) {
                 
-                if(suit.Number == num){
+                if(suit.number == num){
 
                     return suit;
                 }
@@ -116,10 +116,20 @@ public class App {
         }
     }
 
+    public enum CheckResult{
+        CORRECT,
+        GREATER_THAN_CORRECT,
+        SMALLER_THAN_CORRECT,
+    }
+
+    private static final int LIMIT_CHALLENGE_SUIT = 2;
+    private static final int LIMIT_CHALLENGE_RANK = 4;
+
     private static final String MESSAGE_FOR_BLANK = "";
-    private static final String MESSAGE_FOR_PREFACE = "トランプを選んだよ";
+    private static final String MESSAGE_FOR_CHOCE_CARD = "トランプを選んだよ";
 
     private static final String MESSAGE_FOR_QUESTION_SUIT = "トランプの図柄を当ててね";
+    private static final String MESSAGE_FORMAT_FOR_LIMIT_TIME = "答えられるのは%d回までだよ";
     private static final String MESSAGE_FORMAT_FOR_SHOICES_SUIT = "%d:%s";
 
     private static final String MESSAGE_FOR_REQUIRE_ANSWER = "どれだと思う？：";
@@ -127,28 +137,41 @@ public class App {
 
     private static final String MESSAGE_FORMAT_FOR_CORRECT_SUIT = "正解！図柄は%sだよ";
     private static final String MESSAGE_FORMAT_FOR_INCORRECT = "残念！%sじゃないよ";
+    private static final String MESSAGE_FORMAT_FOR_FORCE_CORRECT_SUIT = "正解の図柄は%sでした";
 
     private static final String MESSAGE_FOR_QUESTION_RANK = "次は数字を当ててね";
     private static final String MESSAGE_FORMAT_FOR_REQUIRE_INPUT_WITHIN_RANK = "注意：答えは%sのどれかを入れてね";
 
     private static final String MESSAGE_FORMAT_FOR_CORRECT_CARD = "正解！%sの%sだよ";
+    private static final String MESSAGE_FORMAT_FOR_FORCE_CORRECT_CARD = "正解は%sの%sでした";
+
+    private static final String MESSAGE_FOR_HINT_SMALLER = "もっと小さい数字だよ";
+    private static final String MESSAGE_FOR_HINT_GREATER = "もっと大きい数字だよ";
 
     static{
         init();
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         
-        int correctSuitNumber = createRandomNumber(Suit.first().Number, Suit.last().Number);
+        int correctSuitNumber = createRandomNumber(Suit.first().number, Suit.last().number);
         Suit correctSuit = Suit.getSuitFromNumber(correctSuitNumber);
 
         int correctRankNumber = createRandomNumber(Rank.first().Number, Rank.last().Number);
         Rank correctRank = Rank.getRankFromNumber(correctRankNumber);
 
-        dispPreface();
+        dispchoseCard();
         guessingSuit(correctSuit);
-        guessingRank(correctRank);
-        dispCorrectCard(correctSuit,correctRank);
+        
+        boolean isCorrect = guessingRank(correctRank);
+        
+        if(isCorrect){
+            dispCorrectCard(correctSuit,correctRank);
+        }
+        else{
+            dispForceCorrectCard(correctSuit,correctRank);
+        }
+
         fin();
     }
 
@@ -168,14 +191,19 @@ public class App {
         return random.nextInt(range) + min;
     }
 
-    private static void dispPreface() {
+    private static void dispchoseCard() {
 
-        println(MESSAGE_FOR_PREFACE);
+        println(MESSAGE_FOR_CHOCE_CARD);
     }
 
     private static void dispCorrectCard(Suit correctSuit, Rank correctRank) {
 
         println(MESSAGE_FORMAT_FOR_CORRECT_CARD, correctSuit.Name, correctRank.Name);
+    }
+
+    private static void dispForceCorrectCard(App.Suit correctSuit, App.Rank correctRank) {
+
+        println(MESSAGE_FORMAT_FOR_FORCE_CORRECT_CARD, correctSuit.Name, correctRank.Name);
     }
 
 
@@ -184,7 +212,10 @@ public class App {
         
         dispQuestionSuit();
 
-        while(true){
+        int challengeCount = 0;
+        do{
+            challengeCount++;
+
             Suit answer = getAnswerSuit();
 
             if(isCorrectSuit(answer, correctSuit)){
@@ -194,18 +225,25 @@ public class App {
             }
 
             dispincorrectSuit(answer);
-        }
+
+            if(isLimitOverSuit(challengeCount)){
+    
+                dispForceCorrectSuit(correctSuit);
+            }
+
+        }while(isNextGuessingSuit(challengeCount));
     }
 
     private static void dispQuestionSuit() {
         
         println(MESSAGE_FOR_QUESTION_SUIT);
+        println(MESSAGE_FORMAT_FOR_LIMIT_TIME, LIMIT_CHALLENGE_SUIT);
 
         for (Suit suit : Suit.values()) {
             
-            println(MESSAGE_FORMAT_FOR_SHOICES_SUIT, suit.Number, suit.Name);
+            println(MESSAGE_FORMAT_FOR_SHOICES_SUIT, suit.number, suit.Name);
         }
-
+        
         println(MESSAGE_FOR_BLANK);
     }
 
@@ -213,15 +251,13 @@ public class App {
 
         int input = 0;
 
-        while(true){
-
+        do{
             try{
-
                 dispRequireAnswer();
                 
                 input = scanner.nextInt();
 
-                if(isInRange(input, Suit.first().Number, Suit.last().Number)){               
+                if(isInRange(input, Suit.first().number, Suit.last().number)){               
                     
                     break;
                 }
@@ -233,7 +269,8 @@ public class App {
                 dispRequireInputInRangeNumber();
                 scanner.next();
             }
-        }
+
+        }while(isNeedNextInput());
 
         return Suit.getSuitFromNumber(input);
     }
@@ -245,8 +282,12 @@ public class App {
 
     private static void dispRequireInputInRangeNumber() {
 
-        println(MESSAGE_FORMAT_FOR_REQUIRE_INPUT_IN_RANGE_NUMBER, Suit.first().Number, Suit.last().Number);
+        println(MESSAGE_FORMAT_FOR_REQUIRE_INPUT_IN_RANGE_NUMBER, Suit.first().number, Suit.last().number);
         println(MESSAGE_FOR_BLANK);
+    }
+
+    private static boolean isNeedNextInput() {
+        return true;
     }
 
     private static boolean isInRange(int targetNum, int minValue, int maxValue) {
@@ -269,36 +310,74 @@ public class App {
         println(MESSAGE_FOR_BLANK);
     }
 
+    private static boolean isNextGuessingSuit(int challengeCount) {
+
+        return challengeCount < LIMIT_CHALLENGE_SUIT;
+    }
+
+    private static boolean isLimitOverSuit(int challengeCount) {
+
+        return challengeCount >= LIMIT_CHALLENGE_SUIT;
+    }
+
+    private static void dispForceCorrectSuit(App.Suit correctSuit) {
+
+        println(MESSAGE_FORMAT_FOR_FORCE_CORRECT_SUIT, correctSuit.Name);
+    }
 
 
-    private static void guessingRank(Rank correctRank) {
+
+    private static boolean guessingRank(Rank correctRank) {
 
         dispQuestionRank();
 
-        while(true){
+        int challengeCount = 0;
+        do{
+            challengeCount++;
+
             Rank answer = getAnswerRank();
+            CheckResult result = checkAnswerRank(answer, correctRank);
 
-            if(isCorrectRank(answer, correctRank)){
+            if(result == CheckResult.CORRECT){
 
-                break;
+                return true;
             }
 
-            dispincorrectRank(answer);
-        }
+            dispIncorrectRank(answer);
+            dispHintCorrectRank(result);
+            
+        }while(isNextGuessingRank(challengeCount));
+        
+        return false;
     }
 
     private static void dispQuestionRank() {
 
         println(MESSAGE_FOR_QUESTION_RANK);
+        println(MESSAGE_FORMAT_FOR_LIMIT_TIME, LIMIT_CHALLENGE_RANK);
         println(MESSAGE_FOR_BLANK);
+    }
+
+    private static CheckResult checkAnswerRank(Rank answer, Rank correctRank) {
+
+        if(answer == correctRank){
+
+            return CheckResult.CORRECT;
+        }
+
+        if(answer.Number > correctRank.Number){
+
+            return CheckResult.GREATER_THAN_CORRECT;
+        }
+        
+        return CheckResult.SMALLER_THAN_CORRECT;
     }
 
     private static Rank getAnswerRank() {
         
         String input = "A";
 
-        while(true){
-
+        do{
             dispRequireAnswer();
             
             input = scanner.next();
@@ -309,7 +388,8 @@ public class App {
             }
 
             dispRequireInputWithinRank();
-        }
+        
+        }while(isNeedNextInput());
 
         return Rank.getRankFromName(input);
     }
@@ -320,16 +400,42 @@ public class App {
         println(MESSAGE_FOR_BLANK);
     }
 
-    private static boolean isCorrectRank(Rank answer, Rank correctRank) {
-        return answer == correctRank;
-    }
-
-    private static void dispincorrectRank(Rank answer) {
+    private static void dispIncorrectRank(Rank answer) {
 
         println(MESSAGE_FORMAT_FOR_INCORRECT, answer.Name);
+    }
+
+    private static boolean isNextGuessingRank() {
+        return true;
+    }
+
+    private static void dispHintCorrectRank(App.CheckResult result) {
+
+        if(result == CheckResult.GREATER_THAN_CORRECT){
+
+            dispHintCorrectSmaller();
+            return;
+        }
+        
+        dispHintCorrectGreater();
+    }
+
+    private static void dispHintCorrectSmaller() {
+
+        println(MESSAGE_FOR_HINT_SMALLER);
         println(MESSAGE_FOR_BLANK);
     }
 
+    private static void dispHintCorrectGreater() {
+
+        println(MESSAGE_FOR_HINT_GREATER);
+        println(MESSAGE_FOR_BLANK);
+    }
+
+    private static boolean isNextGuessingRank(int challengeCount) {
+
+        return challengeCount < LIMIT_CHALLENGE_RANK;
+    }
 
 
     private static void print(String str){
