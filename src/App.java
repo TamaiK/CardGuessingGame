@@ -405,10 +405,6 @@ public class App {
         println(MESSAGE_FORMAT_FOR_INCORRECT, answer.Name);
     }
 
-    private static boolean isNextGuessingRank() {
-        return true;
-    }
-
     private static void dispHintCorrectRank(App.CheckResult result) {
 
         if(result == CheckResult.GREATER_THAN_CORRECT){
